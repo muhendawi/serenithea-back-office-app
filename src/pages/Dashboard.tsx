@@ -4,7 +4,7 @@ import Row from "../ui/Row";
 const Dashboard = () => {
   return (
     <Row $type="horizontal">
-      <Heading as="h1" $size="xl">
+      <Heading as="h1" $size="2xl">
         Dashboard
       </Heading>
       <p>TEST</p>

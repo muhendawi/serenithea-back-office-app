@@ -4,7 +4,9 @@ import Row from "../ui/Row";
 const Account = () => {
   return (
     <>
-      <Heading as="h1">Update your account</Heading>
+      <Heading as="h1" $size="2xl">
+        Update your account
+      </Heading>
 
       <Row>
         <Heading as="h3">Update user data</Heading>

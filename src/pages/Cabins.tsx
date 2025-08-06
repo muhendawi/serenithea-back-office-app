@@ -4,7 +4,9 @@ import Row from "../ui/Row";
 const Cabins = () => {
   return (
     <Row $type="horizontal">
-      <Heading as="h1">All cabins</Heading>
+      <Heading as="h1" $size="2xl">
+        All cabins
+      </Heading>
       <p>TEST</p>
     </Row>
   );
