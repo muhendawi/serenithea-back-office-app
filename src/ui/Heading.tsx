@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 
 type HeadingProps = {
-  $size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+  $size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 };
 
 const Heading = styled.h1<HeadingProps>`
@@ -22,8 +22,6 @@ const Heading = styled.h1<HeadingProps>`
           font-size: 2rem;
           font-weight: 500;
         `;
-      default:
-        return "";
     }
   }}
 `;
