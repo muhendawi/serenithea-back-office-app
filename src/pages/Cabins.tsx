@@ -5,7 +5,7 @@ const Cabins = () => {
   return (
     <Row $type="horizontal">
       <Heading as="h1" $size="2xl">
-        All cabins
+        All Rooms
       </Heading>
       <p>TEST</p>
     </Row>
