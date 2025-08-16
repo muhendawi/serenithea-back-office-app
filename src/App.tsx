@@ -10,6 +10,7 @@ import PageNotFound from "./pages/PageNotFound";
 import AppLayout from "./ui/AppLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,29 @@ const App = () => {
         </Routes>
       </BrowserRouter>
       <ReactQueryDevtools />
+      <Toaster
+        position="bottom-center"
+        gutter={12}
+        containerStyle={{ marginBottom: "3rem" }}
+        toastOptions={{
+          success: {
+            duration: 3000,
+          },
+          error: {
+            duration: 5000,
+            icon: "🛑",
+          },
+          style: {
+            fontSize: "16px",
+            maxWidth: "600px",
+            padding: "12px 24px",
+            backgroundColor: "var(--color-grey-50)",
+            borderRadius: "48px",
+            color: "var(--color-grey-700)",
+            boxShadow: "10px 10px 16px #c5c5c5c9, -6px -6px 12px #ffffff",
+          },
+        }}
+      />
     </QueryClientProvider>
   );
 };
