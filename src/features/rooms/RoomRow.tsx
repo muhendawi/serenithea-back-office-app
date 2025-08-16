@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
+import { deleteRoom } from "../../services/apiRooms";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const TableRow = styled.div`
   display: grid;
@@ -8,7 +10,7 @@ const TableRow = styled.div`
   align-items: center;
   padding: 1.4rem 3.5rem;
 
-  /* 👇 this means do not add border-bottom to the last-child in the table */
+  /* 👇 this means do not add border-bottom to the last RoomRow */
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
@@ -43,6 +45,7 @@ const Discount = styled.div`
 `;
 
 type RoomRowProps = {
+  id: number;
   name?: string;
   maxCapacity?: number;
   regularPrice: number;
@@ -51,12 +54,27 @@ type RoomRowProps = {
 };
 
 const RoomRow = ({
+  id,
   name,
   maxCapacity,
   regularPrice,
   discount,
   image,
 }: RoomRowProps) => {
+  const queryClient = useQueryClient();
+  const { mutate, isPending: isDeleting } = useMutation({
+    mutationFn: deleteRoom,
+    onSuccess: () => {
+      alert("Room deleted successfully 🧨");
+      queryClient.invalidateQueries({
+        queryKey: ["rooms"],
+      });
+    },
+    onError: () => {
+      alert("Room could not be deleted");
+    },
+  });
+
   return (
     <TableRow role="row">
       <Img src={image} />
@@ -64,6 +82,9 @@ const RoomRow = ({
       <div>Fits up to {maxCapacity}</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
+      <button onClick={() => mutate(id)} disabled={isDeleting}>
+        Delete
+      </button>
     </TableRow>
   );
 };

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import styled from "styled-components";
-import getRooms from "../../services/apiRooms";
+import { getRooms } from "../../services/apiRooms";
 import Spinner from "../../ui/Spinner";
 import RoomRow from "./RoomRow";
 
@@ -30,12 +30,8 @@ const TableHeader = styled.header`
 `;
 
 const RoomTable = () => {
-  const {
-    data: rooms,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["room"],
+  const { data: rooms, isLoading } = useQuery({
+    queryKey: ["rooms"],
     queryFn: getRooms,
   });
 
@@ -53,6 +49,7 @@ const RoomTable = () => {
       </TableHeader>
       {rooms?.map((room) => (
         <RoomRow
+          id={room.id}
           name={room.name}
           maxCapacity={room.maxCapacity}
           regularPrice={room.regularPrice}

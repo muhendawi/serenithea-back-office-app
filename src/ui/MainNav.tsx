@@ -97,7 +97,7 @@ const MainNav = () => {
           </StyledNavLink>
         </li>
         <li>
-          <StyledNavLink to="/cabins">
+          <StyledNavLink to="/rooms">
             <IoBedOutline />
             <span>Rooms</span>
           </StyledNavLink>
