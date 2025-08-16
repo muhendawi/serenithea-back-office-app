@@ -1,12 +1,14 @@
 import styled from "styled-components";
+import { formatCurrency } from "../../utils/helpers";
 
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
   column-gap: 2.4rem;
   align-items: center;
-  padding: 1.4rem 2.4rem;
+  padding: 1.4rem 3.5rem;
 
+  /* 👇 this means do not add border-bottom to the last-child in the table */
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
@@ -14,6 +16,7 @@ const TableRow = styled.div`
 
 const Img = styled.img`
   display: block;
+  border-radius: 1rem;
   width: 6.4rem;
   aspect-ratio: 3 / 2;
   object-fit: cover;
@@ -21,7 +24,7 @@ const Img = styled.img`
   transform: scale(1.5) translateX(-7px);
 `;
 
-const Cabin = styled.div`
+const Room = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
@@ -38,3 +41,31 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
+
+type RoomRowProps = {
+  name?: string;
+  maxCapacity?: number;
+  regularPrice: number;
+  discount: number;
+  image?: string;
+};
+
+const RoomRow = ({
+  name,
+  maxCapacity,
+  regularPrice,
+  discount,
+  image,
+}: RoomRowProps) => {
+  return (
+    <TableRow role="row">
+      <Img src={image} />
+      <Room>{name}</Room>
+      <div>Fits up to {maxCapacity}</div>
+      <Price>{formatCurrency(regularPrice)}</Price>
+      <Discount>{formatCurrency(discount)}</Discount>
+    </TableRow>
+  );
+};
+
+export default RoomRow;

@@ -18,23 +18,26 @@ import { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
 :root {
   /* golden */
-  --color-brand-50: #f9f6f2;
-  --color-brand-100: #f0e9df;
-  --color-brand-200: #dfd1b9;
-  --color-brand-300: #c8b089;
-  --color-brand-400: #b29468;
-  --color-brand-500: #9a8462; /* base */
-  --color-brand-600: #826c4f;
-  --color-brand-700: #6b573f;
-  --color-brand-800: #564331;
-  --color-brand-900: #3f3124;
+--color-brand-50:  #f9f8f1;
+--color-brand-100: #f1efd9;
+--color-brand-200: #e0ddb1;
+--color-brand-300: #c8c27f;
+--color-brand-400: #b1aa64;
+--color-brand-500: #a39c5a; /* base */
+--color-brand-600: #87814a;
+--color-brand-700: #6b663b;
+--color-brand-800: #504c2c;
+--color-brand-900: #35321e;
 
   /* Grey */
   --color-grey-0: #fff;
   --color-grey-50: #f9fafb;
   --color-grey-100: #f3f4f6;
+  --color-grey-150: #eeedec;
   --color-grey-200: #e5e7eb;
+  --color-grey-250: #d8dbe3;
   --color-grey-300: #d1d5db;
+  --color-grey-350: #b6b9c5;
   --color-grey-400: #9ca3af;
   --color-grey-500: #6b7280;
   --color-grey-600: #4b5563;
@@ -59,6 +62,9 @@ const GlobalStyle = createGlobalStyle`
 
   --backdrop-color: rgba(255, 255, 255, 0.1);
 
+  --shadow-button: 6px 6px 12px #c5c5c5, -6px -6px 12px #ffffff;
+  --shadow-sidebar-header: 6px 6px 12px #c5c5c5, -6px -6px 12px #ededed;
+  --shadow-layout-main: 6px 6px 12px #c5c5c5, -6px -6px 12px #f3f3f3;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0px 0.6rem 2.4rem rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 2.4rem 3.2rem rgba(0, 0, 0, 0.12);
@@ -96,6 +102,7 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   font-size: 1.6rem;
+  padding: 1rem;
 }
 
 input,

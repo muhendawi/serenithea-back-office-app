@@ -3,6 +3,7 @@ import styled, { css } from "styled-components";
 type RowProps = {
   $type?: "horizontal" | "vertical";
 };
+
 const Row = styled.div<RowProps>`
   display: flex;
   /* Since we using TS, instead of using Row.defaultProps to set the default prop we 
