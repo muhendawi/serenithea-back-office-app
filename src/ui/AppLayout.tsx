@@ -17,7 +17,7 @@ const Main = styled.main`
   border-radius: 4rem;
   box-shadow: var(--shadow-layout-main);
   z-index: 902;
-  overflow-y: auto;
+  overflow-y: scroll;
 `;
 
 const Container = styled.div`

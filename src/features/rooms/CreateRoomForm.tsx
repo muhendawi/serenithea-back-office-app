@@ -1,5 +1,3 @@
-import styled from "styled-components";
-
 import { useForm, type SubmitHandler } from "react-hook-form";
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
@@ -9,55 +7,23 @@ import Textarea from "../../ui/Textarea";
 import { createRoom } from "../../services/apiRooms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-
-const FormRow = styled.div`
-  display: grid;
-  align-items: center;
-  grid-template-columns: 24rem 1fr 1.2fr;
-  gap: 2.4rem;
-
-  padding: 1.2rem 0;
-
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:last-child {
-    padding-bottom: 0;
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-
-  &:has(button) {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.2rem;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-`;
-
-// const Error = styled.span`
-//   font-size: 1.4rem;
-//   color: var(--color-red-700);
-// `;
+import type { FormData } from "./roomsTypes";
+import FormRow from "../../ui/FormRow";
 
 function CreateRoomForm() {
-  interface FormData {
-    name: string;
-    maxCapacity: number;
-    regularPrice: number;
-    discount: number;
-    description: string;
-    image: FileList;
-  }
-  const { register, handleSubmit, reset } = useForm<FormData>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors },
+  } = useForm<FormData>();
+
+  // queryClient to invalidate queries to refetch the data immediately after any mutation
   const queryClient = useQueryClient();
-  const { mutate, isPending } = useMutation({
+
+  // useMutation hook for inserting new rooms into the database
+  const { mutate, isPending: isCreating } = useMutation({
     mutationFn: createRoom,
     onSuccess: () => {
       toast.success("Room created successfully!");
@@ -67,65 +33,88 @@ function CreateRoomForm() {
     onError: () => toast.error("Failed to create room"),
   });
 
+  // The form submission function
   const onSubmit: SubmitHandler<FormData> = (data) => {
     mutate(data);
   };
 
+  // const onError = (errors: FieldErrors<FormData>) => {
+  //   console.error("Form submission errors:", errors);
+  //   toast.error("Please fill in all required fields.");
+  // };
+
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <FormRow>
-        <Label htmlFor="name">Room name</Label>
+      <FormRow error={errors.name?.message} label="Room name">
         <Input
           type="text"
           id="name"
           autoComplete="input"
-          {...register("name")}
+          disabled={isCreating}
+          {...register("name", { required: "Room name is required" })}
         />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="maxCapacity">Maximum capacity</Label>
+      <FormRow error={errors.maxCapacity?.message} label="Maximum capacity">
         <Input
           type="number"
           id="maxCapacity"
           autoComplete="input"
-          {...register("maxCapacity")}
+          disabled={isCreating}
+          {...register("maxCapacity", {
+            required: "Max capacity is required",
+            min: {
+              value: 1,
+              message: "Capacity should be at least 1",
+            },
+          })}
         />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="regularPrice">Regular price</Label>
+      <FormRow error={errors.regularPrice?.message} label="Regular price">
         <Input
           type="number"
           id="regularPrice"
           autoComplete="input"
-          {...register("regularPrice")}
+          disabled={isCreating}
+          {...register("regularPrice", {
+            required: "Regular price is required",
+            min: {
+              value: 1,
+              message: "Price should be at least 1",
+            },
+          })}
         />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="discount">Discount</Label>
+      <FormRow error={errors.discount?.message} label="Discount">
         <Input
           type="number"
           id="discount"
           defaultValue={0}
           autoComplete="input"
-          {...register("discount")}
+          disabled={isCreating}
+          {...register("discount", {
+            required: "Discount is required",
+
+            validate: (value: number) =>
+              value <= Number(getValues("regularPrice")) ||
+              "Discount should be less than the regular price",
+          })}
         />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="description">Description for website</Label>
+      <FormRow error={errors.description?.message} label="Description for room">
         <Textarea
           id="description"
           defaultValue=""
-          {...register("description")}
+          disabled={isCreating}
+          {...register("description", { required: "Description is required" })}
         />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" />
+      <FormRow label="Room photo">
+        <FileInput id="image" accept="image/*" disabled={isCreating} />
       </FormRow>
 
       <FormRow>
@@ -133,7 +122,7 @@ function CreateRoomForm() {
         <Button $variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isPending}>Edit cabin</Button>
+        <Button disabled={isCreating}>Edit cabin</Button>
       </FormRow>
     </Form>
   );

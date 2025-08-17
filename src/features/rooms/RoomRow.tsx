@@ -69,13 +69,13 @@ const RoomRow = ({
     onSuccess: () => {
       toast.success(
         <span>
-          Room No.{" "}
+          Room{" "}
           <span
             style={{
               textDecoration: "underline",
             }}
           >
-            {id}
+            {name}
           </span>{" "}
           is successfully deleted
         </span>
