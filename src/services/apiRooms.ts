@@ -17,3 +17,19 @@ export const deleteRoom = async (id: number) => {
     throw new Error("Room could not be deleted!");
   }
 };
+
+export const createRoom = async (roomData: {
+  name: string;
+  maxCapacity: number;
+  regularPrice: number;
+  discount: number;
+  description?: string;
+}) => {
+  const { data, error } = await supabase.from("rooms").insert([roomData]);
+
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to create Room");
+  }
+  return data;
+};

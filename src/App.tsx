@@ -20,6 +20,24 @@ const queryClient = new QueryClient({
   },
 });
 
+const toastOptions = {
+  success: {
+    duration: 3000,
+  },
+  error: {
+    duration: 5000,
+  },
+  style: {
+    fontSize: "16px",
+    maxWidth: "600px",
+    padding: "12px 24px",
+    backgroundColor: "var(--color-grey-50)",
+    borderRadius: "48px",
+    color: "var(--color-grey-700)",
+    boxShadow: "10px 10px 16px #c5c5c5c9, -6px -6px 12px #ffffff",
+  },
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -41,27 +59,10 @@ const App = () => {
       </BrowserRouter>
       <ReactQueryDevtools />
       <Toaster
-        position="bottom-center"
+        position="top-center"
         gutter={12}
-        containerStyle={{ marginBottom: "3rem" }}
-        toastOptions={{
-          success: {
-            duration: 3000,
-          },
-          error: {
-            duration: 5000,
-            icon: "🛑",
-          },
-          style: {
-            fontSize: "16px",
-            maxWidth: "600px",
-            padding: "12px 24px",
-            backgroundColor: "var(--color-grey-50)",
-            borderRadius: "48px",
-            color: "var(--color-grey-700)",
-            boxShadow: "10px 10px 16px #c5c5c5c9, -6px -6px 12px #ffffff",
-          },
-        }}
+        containerStyle={{ marginTop: "3rem" }}
+        toastOptions={toastOptions}
       />
     </QueryClientProvider>
   );

@@ -20,13 +20,23 @@ const Main = styled.main`
   overflow-y: auto;
 `;
 
+const Container = styled.div`
+  max-width: 120rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+`;
+
 const AppLayout = () => {
   return (
     <StyledAppLayout>
       <Header />
       <Sidebar />
       <Main>
-        <Outlet />
+        <Container>
+          <Outlet />
+        </Container>
       </Main>
     </StyledAppLayout>
   );

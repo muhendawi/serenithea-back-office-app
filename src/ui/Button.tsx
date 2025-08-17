@@ -55,7 +55,7 @@ type ButtonProps = {
 
 const Button = styled.button<ButtonProps>`
   border: none;
-  border-radius: var(--border-radius-sm);
+  border-radius: 4rem;
   box-shadow: var(--shadow-sm);
   ${({ $size = "medium" }) => sizes[$size]};
   ${({ $variation = "primary" }) => variations[$variation]};

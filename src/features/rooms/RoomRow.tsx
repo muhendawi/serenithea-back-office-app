@@ -67,19 +67,27 @@ const RoomRow = ({
   const { mutate, isPending: isDeleting } = useMutation({
     mutationFn: deleteRoom,
     onSuccess: () => {
-      toast(
+      toast.success(
         <span>
-          Room No. <span style={{ fontWeight: 600, color: "green" }}>{id}</span>{" "}
-          is <span style={{ color: "red", fontWeight: 600 }}>deleted</span>{" "}
-          successfully 🗑️
+          Room No.{" "}
+          <span
+            style={{
+              textDecoration: "underline",
+            }}
+          >
+            {id}
+          </span>{" "}
+          is successfully deleted
         </span>
       );
       queryClient.invalidateQueries({
         queryKey: ["rooms"],
       });
     },
-    onError: () => {
-      toast("Room could not be deleted 🚫");
+    onError: (err) => {
+      toast.error(
+        err.message || "Something went wrong while deleting the room."
+      );
     },
   });
 
