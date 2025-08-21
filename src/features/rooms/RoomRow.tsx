@@ -3,7 +3,7 @@ import { formatCurrency } from "../../utils/helpers";
 import { deleteRoom } from "../../services/apiRooms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { BsFillTrash3Fill } from "react-icons/bs";
+import type { RoomRowTypes } from "../../types/roomsFormTypes";
 
 const TableRow = styled.div`
   display: grid;
@@ -46,23 +46,14 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 
+//-----------------------------------------------------------------------------------
+
+// Type composition/nesting to not destructure all the props
 type RoomRowProps = {
-  id: number;
-  name?: string;
-  maxCapacity?: number;
-  regularPrice: number;
-  discount: number;
-  image?: string;
+  room: RoomRowTypes;
 };
 
-const RoomRow = ({
-  id,
-  name,
-  maxCapacity,
-  regularPrice,
-  discount,
-  image,
-}: RoomRowProps) => {
+const RoomRow = ({ room }: RoomRowProps) => {
   const queryClient = useQueryClient();
   const { mutate, isPending: isDeleting } = useMutation({
     mutationFn: deleteRoom,
@@ -75,7 +66,7 @@ const RoomRow = ({
               textDecoration: "underline",
             }}
           >
-            {name}
+            {room.name}
           </span>{" "}
           is successfully deleted
         </span>
@@ -93,12 +84,12 @@ const RoomRow = ({
 
   return (
     <TableRow role="row">
-      <Img src={image} />
-      <Room>{name}</Room>
-      <div>Fits up to {maxCapacity}</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{formatCurrency(discount)}</Discount>
-      <button onClick={() => mutate(id)} disabled={isDeleting}>
+      <Img src={room.image} />
+      <Room>{room.name}</Room>
+      <div>Fits up to {room.maxCapacity}</div>
+      <Price>{formatCurrency(room.regularPrice)}</Price>
+      <Discount>{formatCurrency(room.discount)}</Discount>
+      <button onClick={() => mutate(room.id)} disabled={isDeleting}>
         Delete
       </button>
     </TableRow>

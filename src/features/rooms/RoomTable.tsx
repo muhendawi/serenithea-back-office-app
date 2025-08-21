@@ -28,6 +28,8 @@ const TableHeader = styled.header`
   padding: 1.6rem 2.4rem;
 `;
 
+//-----------------------------------------------------------------------------------
+
 const RoomTable = () => {
   const { data: rooms, isLoading } = useQuery({
     queryKey: ["rooms"],
@@ -47,15 +49,7 @@ const RoomTable = () => {
         <div></div>
       </TableHeader>
       {rooms?.map((room) => (
-        <RoomRow
-          id={room.id}
-          name={room.name}
-          maxCapacity={room.maxCapacity}
-          regularPrice={room.regularPrice}
-          discount={room.discount}
-          image={room.image}
-          key={room.id}
-        />
+        <RoomRow room={room} key={room.id} />
       ))}
     </Table>
   );

@@ -1,4 +1,4 @@
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
@@ -7,7 +7,7 @@ import Textarea from "../../ui/Textarea";
 import { createRoom } from "../../services/apiRooms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import type { FormData } from "./roomsTypes";
+import type { FormDataTypes } from "../../types/roomsFormTypes";
 import FormRow from "../../ui/FormRow";
 
 function CreateRoomForm() {
@@ -17,7 +17,7 @@ function CreateRoomForm() {
     reset,
     getValues,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormDataTypes>();
 
   // queryClient to invalidate queries to refetch the data immediately after any mutation
   const queryClient = useQueryClient();
@@ -34,8 +34,8 @@ function CreateRoomForm() {
   });
 
   // The form submission function
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    mutate(data);
+  const onSubmit = (data: FormDataTypes) => {
+    mutate({ ...data, image: data.image[0] });
   };
 
   // const onError = (errors: FieldErrors<FormData>) => {
@@ -96,7 +96,10 @@ function CreateRoomForm() {
           disabled={isCreating}
           {...register("discount", {
             required: "Discount is required",
-
+            min: {
+              value: 0,
+              message: "Discount cannot be minus (-)",
+            },
             validate: (value: number) =>
               value <= Number(getValues("regularPrice")) ||
               "Discount should be less than the regular price",
@@ -114,7 +117,11 @@ function CreateRoomForm() {
       </FormRow>
 
       <FormRow label="Room photo">
-        <FileInput id="image" accept="image/*" disabled={isCreating} />
+        <FileInput
+          id="image"
+          accept="image/*"
+          {...register("image", { required: "Description is required" })}
+        />
       </FormRow>
 
       <FormRow>
