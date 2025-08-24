@@ -1,19 +1,11 @@
 type FormDataTypes = {
+  id?: number;
   name: string;
   maxCapacity: number;
   regularPrice: number;
   discount: number;
   description: string;
-  image: FileList;
+  image: FileList | File | string;
 };
 
-type RoomRowTypes = {
-  id: number;
-  name?: string;
-  maxCapacity?: number;
-  regularPrice: number;
-  discount: number;
-  image?: string;
-};
-
-export { type FormDataTypes, type RoomRowTypes };
+export { type FormDataTypes };

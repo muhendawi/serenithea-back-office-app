@@ -1,3 +1,4 @@
+import type { FormDataTypes } from "../types/roomsFormTypes";
 import { supabase, supabaseUrl } from "./supabase";
 
 export const getRooms = async () => {
@@ -18,15 +19,21 @@ export const deleteRoom = async (id: number) => {
   }
 };
 
-export const createRoom = async (newRoom: {
-  name: string;
-  maxCapacity: number;
-  regularPrice: number;
-  discount: number;
-  description: string;
-  image: File;
-}) => {
-  const imageName = `${Math.random()}-${newRoom.image.name}`
+//------------------------------------------------------------------------------------------------
+/* CREATING NEW ROOM */
+//------------------------------------------------------------------------------------------------
+// Type guard function
+const isFile = (image: FileList | File | string): image is File => {
+  return image instanceof File;
+};
+
+export const createRoom = async (newRoom: FormDataTypes) => {
+  // Type guard check
+  if (!isFile(newRoom.image)) {
+    throw new Error("Image must be a File object for room creation");
+  }
+
+  const imageName = `${newRoom.image.name}-${Math.random()}`
     .replaceAll("/", "")
     .replaceAll(" ", "");
   const imagePath = `${supabaseUrl}/storage/v1/object/public/room-images/${imageName}`;
@@ -65,6 +72,24 @@ export const createRoom = async (newRoom: {
     throw new Error(
       "Room image could not be uploaded and the room was not created!"
     );
+  }
+
+  return data;
+};
+
+//------------------------------------------------------------------------------------------------
+/* UPDATING AN EXISTING ROOM */
+//------------------------------------------------------------------------------------------------
+export const updateRoom = async (updatedRoom: FormDataTypes) => {
+  const { data, error } = await supabase
+    .from("rooms")
+    .update(updatedRoom)
+    .eq("some_column", "someValue")
+    .select();
+
+  if (error) {
+    console.error(error);
+    throw new Error("Room cannot be updated");
   }
 
   return data;

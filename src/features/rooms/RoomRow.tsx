@@ -3,7 +3,9 @@ import { formatCurrency } from "../../utils/helpers";
 import { deleteRoom } from "../../services/apiRooms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import type { RoomRowTypes } from "../../types/roomsFormTypes";
+import type { FormDataTypes } from "../../types/roomsFormTypes";
+import { useState } from "react";
+import CreateRoomForm from "./CreateRoomForm";
 
 const TableRow = styled.div`
   display: grid;
@@ -50,10 +52,11 @@ const Discount = styled.div`
 
 // Type composition/nesting to not destructure all the props
 type RoomRowProps = {
-  room: RoomRowTypes;
+  room: FormDataTypes;
 };
 
 const RoomRow = ({ room }: RoomRowProps) => {
+  const [showForm, setShowForm] = useState(false);
   const queryClient = useQueryClient();
   const { mutate, isPending: isDeleting } = useMutation({
     mutationFn: deleteRoom,
@@ -81,19 +84,30 @@ const RoomRow = ({ room }: RoomRowProps) => {
       );
     },
   });
-
-  return (
-    <TableRow role="row">
-      <Img src={room.image} />
-      <Room>{room.name}</Room>
-      <div>Fits up to {room.maxCapacity}</div>
-      <Price>{formatCurrency(room.regularPrice)}</Price>
-      <Discount>{formatCurrency(room.discount)}</Discount>
-      <button onClick={() => mutate(room.id)} disabled={isDeleting}>
-        Delete
-      </button>
-    </TableRow>
-  );
+  if (typeof room.image === "string")
+    return (
+      <>
+        <TableRow role="row">
+          <Img src={room.image} />
+          <Room>{room.name}</Room>
+          <div>Fits up to {room.maxCapacity}</div>
+          <Price>{formatCurrency(room.regularPrice)}</Price>
+          <Discount>{formatCurrency(room.discount)}</Discount>
+          <div>
+            <button onClick={() => setShowForm((show) => !show)}>Edit</button>
+            <button
+              onClick={() => {
+                if (typeof room.id === "number") mutate(room.id);
+              }}
+              disabled={isDeleting}
+            >
+              Delete
+            </button>
+          </div>
+        </TableRow>
+        {showForm && <CreateRoomForm roomToEdit={room} />}
+      </>
+    );
 };
 
 export default RoomRow;

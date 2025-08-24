@@ -1,23 +1,31 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import { createRoom } from "../../services/apiRooms";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import type { FormDataTypes } from "../../types/roomsFormTypes";
 import FormRow from "../../ui/FormRow";
 
-function CreateRoomForm() {
+type CreateRoomFormProps = {
+  roomToEdit: FormDataTypes;
+};
+
+function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
+  const isEditSession = Boolean(roomToEdit?.id);
   const {
     register,
     handleSubmit,
     reset,
     getValues,
     formState: { errors },
-  } = useForm<FormDataTypes>();
+  } = useForm<FormDataTypes>({
+    defaultValues: isEditSession ? roomToEdit : {},
+  });
 
   // queryClient to invalidate queries to refetch the data immediately after any mutation
   const queryClient = useQueryClient();
@@ -35,7 +43,8 @@ function CreateRoomForm() {
 
   // The form submission function
   const onSubmit = (data: FormDataTypes) => {
-    mutate({ ...data, image: data.image[0] });
+    if (data.image instanceof FileList)
+      mutate({ ...data, image: data.image[0] });
   };
 
   // const onError = (errors: FieldErrors<FormData>) => {
@@ -110,7 +119,6 @@ function CreateRoomForm() {
       <FormRow error={errors.description?.message} label="Description for room">
         <Textarea
           id="description"
-          defaultValue=""
           disabled={isCreating}
           {...register("description", { required: "Description is required" })}
         />
@@ -120,7 +128,9 @@ function CreateRoomForm() {
         <FileInput
           id="image"
           accept="image/*"
-          {...register("image", { required: "Description is required" })}
+          {...register("image", {
+            required: isEditSession ? false : "Image is required",
+          })}
         />
       </FormRow>
 
