@@ -1,69 +1,74 @@
-# React + TypeScript + Vite
+# Serenithea Back Office App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the back-office application for Serenithea Hotel, a fictional hotel management platform. This dashboard allows hotel staff to manage bookings, rooms, guests, and view key metrics.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Dashboard:** View key metrics like sales, check-ins, and occupancy rate.
+- **Bookings:** View, edit, and delete bookings.
+- **Rooms:** Manage hotel rooms, including creating, editing, and deleting rooms.
+- **Check-in/Check-out:** Easily manage guest check-ins and check-outs.
+- **User Authentication:** Secure login for hotel staff.
+- **Settings:** Update hotel-wide settings.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework:** [React](https://reactjs.org/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool:** [Vite](https://vitejs.dev/)
+- **Backend:** [Supabase](https://supabase.io/)
+- **Styling:** [Styled Components](https://styled-components.com/)
+- **Data Fetching:** [React Query](https://tanstack.com/query/v5)
+- **Routing:** [React Router](https://reactrouter.com/)
+- **Forms:** [React Hook Form](https://react-hook-form.com/)
+- **Toasts/Notifications:** [React Hot Toast](https://react-hot-toast.com/)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- [Node.js](https://nodejs.org/en/) (v18 or higher)
+- [Bun](https://bun.sh/)
+
+### Installation & Setup
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/muhendawi/serenithea-back-office-app.git
+    cd serenithea-back-office-app
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    bun install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project and add your Supabase URL and Key. You can find these in your Supabase project settings.
+
+    ```env
+    VITE_SUPABASE_URL="your-supabase-url"
+    VITE_SUPABASE_KEY="your-supabase-key"
+    ```
+
+### Running the Application
+
+To start the development server, run:
+
+```bash
+bun dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The application will be available at `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📦 Build for Production
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+To build the application for production, run:
+
+```bash
+bun run build
 ```
+
+This will create a `dist` folder with the production-ready files.
