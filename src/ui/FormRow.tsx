@@ -34,6 +34,7 @@ const Label = styled.label`
 
 const Error = styled.span`
   font-size: 1.4rem;
+  /* text-align: end; */
   color: var(--color-red-700);
 `;
 

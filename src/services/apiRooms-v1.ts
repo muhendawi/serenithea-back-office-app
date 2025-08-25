@@ -87,72 +87,30 @@ export const createRoom = async (newRoom: FormDataTypes) => {
 /* UPDATING AN EXISTING ROOM */
 //------------------------------------------------------------------------------------------------
 export const updateRoom = async (updatedRoom: FormDataTypes) => {
-  let imagePath: string;
-  let shouldUploadImage = false;
-  let imageFile: File | null = null;
-  let imageName: string = "";
+  let hasImagePath;
+  let imageName;
 
-  // Handle different image types
-  if (typeof updatedRoom.image === "string") {
-    // Existing image - use the current path
-    imagePath = updatedRoom.image;
-    shouldUploadImage = false;
-  } else if (updatedRoom.image instanceof File) {
-    // New file upload
-    imageFile = updatedRoom.image;
-    imageName = `${imageFile.name}-${Math.random()}`
+  if (updatedRoom.image instanceof File)
+    imageName = `${updatedRoom.image.name}-${Math.random()}`
       .replaceAll("/", "")
       .replaceAll(" ", "");
-    imagePath = `${supabaseUrl}/storage/v1/object/public/room-images/${imageName}`;
-    shouldUploadImage = true;
-  } else if (
-    updatedRoom.image instanceof FileList &&
-    updatedRoom.image.length > 0
-  ) {
-    // FileList with at least one file
-    imageFile = updatedRoom.image[0];
-    imageName = `${imageFile.name}-${Math.random()}`
-      .replaceAll("/", "")
-      .replaceAll(" ", "");
-    imagePath = `${supabaseUrl}/storage/v1/object/public/room-images/${imageName}`;
-    shouldUploadImage = true;
-  } else {
-    throw new Error("Invalid image type for room update");
-  }
 
-  // 1. Update the room in database
+  if (typeof updatedRoom.image === "string")
+    hasImagePath = updatedRoom.image.startsWith(supabaseUrl);
+
+  const imagePath = hasImagePath
+    ? updatedRoom.image
+    : `${supabaseUrl}/storage/v1/object/public/room-images/${imageName}`;
+
   const { data, error } = await supabase
     .from("rooms")
-    .update({
-      name: updatedRoom.name,
-      maxCapacity: updatedRoom.maxCapacity,
-      regularPrice: updatedRoom.regularPrice,
-      discount: updatedRoom.discount,
-      description: updatedRoom.description,
-      image: imagePath,
-    })
+    .update({ ...updatedRoom, image: imagePath })
     .eq("id", updatedRoom.id)
-    .select()
-    .single();
+    .select();
 
   if (error) {
     console.error(error);
     throw new Error("Room cannot be updated");
-  }
-
-  // 2. Upload the image (only if we have a new file)
-  if (shouldUploadImage && imageFile) {
-    const { error: storageError } = await supabase.storage
-      .from("room-images")
-      .upload(imageName, imageFile);
-
-    // 3. Revert the room update IF there was an error uploading the image
-    if (storageError) {
-      console.error(storageError);
-      throw new Error(
-        "Room image could not be uploaded and the room update failed!"
-      );
-    }
   }
 
   return data;

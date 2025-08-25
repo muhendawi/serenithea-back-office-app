@@ -7,7 +7,7 @@ import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import { createRoom, updateRoom } from "../../services/apiRooms";
+import { createRoom } from "../../services/apiRooms";
 import type { FormDataTypes } from "../../types/roomsFormTypes";
 import FormRow from "../../ui/FormRow";
 
@@ -30,7 +30,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
   const queryClient = useQueryClient();
 
   // useMutation hook for inserting new rooms into the database
-  const { mutate: createNewRoom, isPending: isCreating } = useMutation({
+  const { mutate, isPending: isCreating } = useMutation({
     mutationFn: createRoom,
     onSuccess: () => {
       toast.success("Room created successfully!");
@@ -40,40 +40,10 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
     onError: () => toast.error("Failed to create room"),
   });
 
-  // useMutation hook for editing an existing room
-  const { mutate: updateExistingRoom, isPending: isEditing } = useMutation({
-    mutationFn: updateRoom,
-    onSuccess: () => {
-      toast.success("Room successfully Edited!");
-      queryClient.invalidateQueries({ queryKey: ["rooms"] });
-      reset();
-    },
-    onError: () => toast.error("Failed to Edit room"),
-  });
-
-  const isCreatingOrEditing = isCreating || isEditing;
-
   // The form submission function
   const onSubmit = (data: FormDataTypes) => {
-    // console.log("Form submitted:", { isEditSession, data });
-    // Safely extract the file if it exists
-    const selectedFile =
-      data.image instanceof FileList && data.image.length > 0
-        ? data.image[0]
-        : null;
-
-    if (isEditSession) {
-      // Use new file or fallback to existing image
-      const imageToUse = selectedFile || roomToEdit.image;
-      updateExistingRoom({ ...data, image: imageToUse });
-    } else {
-      // Creating requires a file
-      if (selectedFile) {
-        createNewRoom({ ...data, image: selectedFile });
-      } else {
-        toast.error("Please select an image for the new room");
-      }
-    }
+    if (data.image instanceof FileList)
+      mutate({ ...data, image: data.image[0] });
   };
 
   // const onError = (errors: FieldErrors<FormData>) => {
@@ -88,7 +58,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
           type="text"
           id="name"
           autoComplete="input"
-          disabled={isCreatingOrEditing}
+          disabled={isCreating}
           {...register("name", { required: "Room name is required" })}
         />
       </FormRow>
@@ -98,7 +68,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
           type="number"
           id="maxCapacity"
           autoComplete="input"
-          disabled={isCreatingOrEditing}
+          disabled={isCreating}
           {...register("maxCapacity", {
             required: "Max capacity is required",
             min: {
@@ -114,7 +84,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
           type="number"
           id="regularPrice"
           autoComplete="input"
-          disabled={isCreatingOrEditing}
+          disabled={isCreating}
           {...register("regularPrice", {
             required: "Regular price is required",
             min: {
@@ -131,7 +101,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
           id="discount"
           defaultValue={0}
           autoComplete="input"
-          disabled={isCreatingOrEditing}
+          disabled={isCreating}
           {...register("discount", {
             required: "Discount is required",
             min: {
@@ -148,17 +118,16 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
       <FormRow error={errors.description?.message} label="Description for room">
         <Textarea
           id="description"
-          disabled={isCreatingOrEditing}
+          disabled={isCreating}
           {...register("description", { required: "Description is required" })}
         />
       </FormRow>
 
-      <FormRow error={errors.image?.message} label="Room photo">
+      <FormRow label="Room photo">
         <FileInput
           id="image"
           accept="image/*"
           {...register("image", {
-            // this disable the required input during editing
             required: isEditSession ? false : "Image is required",
           })}
         />
@@ -169,9 +138,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
         <Button $variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreatingOrEditing}>
-          {isEditSession ? "Edit room" : "Add room"}
-        </Button>
+        <Button disabled={isCreating}>Edit cabin</Button>
       </FormRow>
     </Form>
   );

@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    image: serenithea-back-office-app:dev
     container_name: serenithea-back-office-app-dev
     ports:
       - "5173:5173"
@@ -19,6 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: serenithea-back-office-app:prod
     container_name: serenithea-back-office-app-prod
     ports:
       - "8080:80"
