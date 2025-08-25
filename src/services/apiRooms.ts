@@ -26,6 +26,23 @@ export const deleteRoom = async (id: number) => {
 };
 
 //------------------------------------------------------------------------------------------------
+/* A HELPER FUNCTION FOR IMAGE UPLOAD */
+//------------------------------------------------------------------------------------------------
+const uploadImage = async (imageName: string, imageFile: File, id: number) => {
+  const { error: storageError } = await supabase.storage
+    .from("room-images")
+    .upload(imageName, imageFile);
+
+  // 3. Revert the room update IF there was an error uploading the image
+  if (storageError) {
+    await supabase.from("rooms").delete().eq("id", id);
+    console.error(storageError);
+    throw new Error(
+      "Room image could not be uploaded and the room was not created!"
+    );
+  }
+};
+//------------------------------------------------------------------------------------------------
 /* CREATING NEW ROOM */
 //------------------------------------------------------------------------------------------------
 // Type guard function
@@ -67,18 +84,7 @@ export const createRoom = async (newRoom: FormDataTypes) => {
   }
 
   // 2. Upload the image
-  const { error: storageError } = await supabase.storage
-    .from("room-images")
-    .upload(imageName, newRoom.image);
-
-  // 3. Delete the room IF the there was and Error uploading the image
-  if (storageError) {
-    await supabase.from("rooms").delete().eq("id", data.id);
-    console.error(storageError);
-    throw new Error(
-      "Room image could not be uploaded and the room was not created!"
-    );
-  }
+  await uploadImage(imageName, newRoom.image, data.id);
 
   return data;
 };
@@ -100,17 +106,6 @@ export const updateRoom = async (updatedRoom: FormDataTypes) => {
   } else if (updatedRoom.image instanceof File) {
     // New file upload
     imageFile = updatedRoom.image;
-    imageName = `${imageFile.name}-${Math.random()}`
-      .replaceAll("/", "")
-      .replaceAll(" ", "");
-    imagePath = `${supabaseUrl}/storage/v1/object/public/room-images/${imageName}`;
-    shouldUploadImage = true;
-  } else if (
-    updatedRoom.image instanceof FileList &&
-    updatedRoom.image.length > 0
-  ) {
-    // FileList with at least one file
-    imageFile = updatedRoom.image[0];
     imageName = `${imageFile.name}-${Math.random()}`
       .replaceAll("/", "")
       .replaceAll(" ", "");
@@ -142,17 +137,7 @@ export const updateRoom = async (updatedRoom: FormDataTypes) => {
 
   // 2. Upload the image (only if we have a new file)
   if (shouldUploadImage && imageFile) {
-    const { error: storageError } = await supabase.storage
-      .from("room-images")
-      .upload(imageName, imageFile);
-
-    // 3. Revert the room update IF there was an error uploading the image
-    if (storageError) {
-      console.error(storageError);
-      throw new Error(
-        "Room image could not be uploaded and the room update failed!"
-      );
-    }
+    await uploadImage(imageName, imageFile, data.id);
   }
 
   return data;

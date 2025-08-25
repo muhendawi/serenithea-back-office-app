@@ -66,6 +66,7 @@ const StyledNavLink = styled(NavLink)`
     color: #a39c5a;
     box-shadow: 2px 2px 6px #c5c5c5, -6px -6px 12px #ffffff;
     transform: translateY(2px) translateX(2px) scale(0.99);
+    font-weight: 500;
   }
 
   & svg {
@@ -77,6 +78,7 @@ const StyledNavLink = styled(NavLink)`
 
   &.active svg {
     color: #a39c5a;
+    stroke-width: 1.8;
   }
 `;
 
