@@ -61,7 +61,7 @@ const Button = styled.button<ButtonProps>`
   overflow: hidden;
   z-index: 1;
   ${({ $size = "medium" }) => sizes[$size]};
-  /* ${({ $variation = "primary" }) => variations[$variation]}; */
+  ${({ $variation = "primary" }) => variations[$variation]};
   transition: 0.5s ease;
 
   &::before {
@@ -73,7 +73,7 @@ const Button = styled.button<ButtonProps>`
     top: 0;
     left: 0;
     background-image: linear-gradient(to right, var(--color-brand-500) 0%);
-    transition: 0.5s ease;
+    transition: 0.3s ease;
     display: block;
     z-index: -1;
   }
