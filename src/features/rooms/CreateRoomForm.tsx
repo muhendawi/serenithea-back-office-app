@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -7,15 +6,25 @@ import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import { createRoom, updateRoom } from "../../services/apiRooms";
+
 import type { FormDataTypes } from "../../types/roomsFormTypes";
 import FormRow from "../../ui/FormRow";
+import useCreateRoom from "./useCreateRoom";
+import useUpdateRoom from "./useUpdateRoom";
 
 type CreateRoomFormProps = {
   roomToEdit: FormDataTypes;
 };
 
 function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
+  // A Custom Hook for useMutation hook for inserting new rooms into the database
+  const { createNewRoom, isCreating } = useCreateRoom();
+
+  // A Custom Hook for useMutation hook for editing an existing room
+  const { updateExistingRoom, isEditing } = useUpdateRoom();
+
+  const isCreatingOrEditing = isCreating || isEditing;
+
   const isEditSession = Boolean(roomToEdit?.id);
   const {
     register,
@@ -26,32 +35,6 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
   } = useForm<FormDataTypes>({
     defaultValues: isEditSession ? roomToEdit : {},
   });
-  // queryClient to invalidate queries to refetch the data immediately after any mutation
-  const queryClient = useQueryClient();
-
-  // useMutation hook for inserting new rooms into the database
-  const { mutate: createNewRoom, isPending: isCreating } = useMutation({
-    mutationFn: createRoom,
-    onSuccess: () => {
-      toast.success("Room created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["rooms"] });
-      reset();
-    },
-    onError: () => toast.error("Failed to create room"),
-  });
-
-  // useMutation hook for editing an existing room
-  const { mutate: updateExistingRoom, isPending: isEditing } = useMutation({
-    mutationFn: updateRoom,
-    onSuccess: () => {
-      toast.success("Room successfully Edited!");
-      queryClient.invalidateQueries({ queryKey: ["rooms"] });
-      reset();
-    },
-    onError: () => toast.error("Failed to Edit room"),
-  });
-
-  const isCreatingOrEditing = isCreating || isEditing;
 
   // The form submission function
   const onSubmit = (data: FormDataTypes) => {
@@ -65,21 +48,30 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
     if (isEditSession) {
       // Use new file or fallback to existing image
       const imageToUse = selectedFile || roomToEdit.image;
-      updateExistingRoom({ ...data, image: imageToUse });
+      updateExistingRoom(
+        { ...data, image: imageToUse },
+        {
+          onSuccess: () => {
+            reset();
+          },
+        }
+      );
     } else {
       // Creating requires a file
       if (selectedFile) {
-        createNewRoom({ ...data, image: selectedFile });
+        createNewRoom(
+          { ...data, image: selectedFile },
+          {
+            onSuccess: () => {
+              reset();
+            },
+          }
+        );
       } else {
         toast.error("Please select an image for the new room");
       }
     }
   };
-
-  // const onError = (errors: FieldErrors<FormData>) => {
-  //   console.error("Form submission errors:", errors);
-  //   toast.error("Please fill in all required fields.");
-  // };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>

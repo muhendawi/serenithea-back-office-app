@@ -1,13 +1,17 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { deleteRoom } from "../../services/apiRooms";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import type { FormDataTypes } from "../../types/roomsFormTypes";
 import { useState } from "react";
 import CreateRoomForm from "./CreateRoomForm";
+import useDeleteRoom from "./useDeleteRoom";
+import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
+import useDuplicateRoom from "./useDuplicateRoom";
 
-const TableRow = styled.div`
+type TableRowProps = {
+  $showFormToEdit: boolean;
+};
+
+const TableRow = styled.div<TableRowProps>`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
   column-gap: 2.4rem;
@@ -16,7 +20,14 @@ const TableRow = styled.div`
 
   /* 👇 this means do not add border-bottom to the last RoomRow */
   &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
+    ${({ $showFormToEdit }) =>
+      $showFormToEdit
+        ? css`
+            border-bottom: 1px solid transparent;
+          `
+        : css`
+            border-bottom: 1px solid var(--color-grey-100);
+          `}
   }
 `;
 
@@ -55,59 +66,59 @@ type RoomRowProps = {
   room: FormDataTypes;
 };
 
+// Type guard function
+const isString = (image: FileList | File | string): image is string => {
+  return typeof image === "string";
+};
+
 const RoomRow = ({ room }: RoomRowProps) => {
-  const [showForm, setShowForm] = useState(false);
-  const queryClient = useQueryClient();
-  const { mutate, isPending: isDeleting } = useMutation({
-    mutationFn: deleteRoom,
-    onSuccess: () => {
-      toast.success(
-        <span>
-          Room{" "}
-          <span
-            style={{
-              textDecoration: "underline",
+  if (!isString(room.image)) {
+    throw new Error("Image must be a string");
+  }
+
+  const { duplicateExistingRoom, isDuplicating } = useDuplicateRoom();
+
+  const roomProps: FormDataTypes = {
+    ...room,
+    name: `Copy of ${room.name}`,
+  };
+
+  const handleDuplicate = () => {
+    duplicateExistingRoom(roomProps);
+  };
+
+  const [showFormToEdit, setShowFormToEdit] = useState(false);
+
+  const { mutate, isDeleting } = useDeleteRoom(room.name);
+
+  return (
+    <>
+      <TableRow role="row" $showFormToEdit={showFormToEdit}>
+        <Img src={room.image} />
+        <Room>{room.name}</Room>
+        <div>Fits up to {room.maxCapacity}</div>
+        <Price>{formatCurrency(room.regularPrice)}</Price>
+        <Discount>{formatCurrency(room.discount)}</Discount>
+        <div>
+          <button onClick={handleDuplicate} disabled={isDuplicating}>
+            <HiSquare2Stack />
+          </button>
+          <button onClick={() => setShowFormToEdit((show) => !show)}>
+            <HiPencil />
+          </button>
+          <button
+            onClick={() => {
+              if (typeof room.id === "number") mutate(room.id);
             }}
+            disabled={isDeleting}
           >
-            {room.name}
-          </span>{" "}
-          is successfully deleted
-        </span>
-      );
-      queryClient.invalidateQueries({
-        queryKey: ["rooms"],
-      });
-    },
-    onError: (err) => {
-      toast.error(
-        err.message || "Something went wrong while deleting the room."
-      );
-    },
-  });
-  if (typeof room.image === "string")
-    return (
-      <>
-        <TableRow role="row">
-          <Img src={room.image} />
-          <Room>{room.name}</Room>
-          <div>Fits up to {room.maxCapacity}</div>
-          <Price>{formatCurrency(room.regularPrice)}</Price>
-          <Discount>{formatCurrency(room.discount)}</Discount>
-          <div>
-            <button onClick={() => setShowForm((show) => !show)}>Edit</button>
-            <button
-              onClick={() => {
-                if (typeof room.id === "number") mutate(room.id);
-              }}
-              disabled={isDeleting}
-            >
-              Delete
-            </button>
-          </div>
-        </TableRow>
-        {showForm && <CreateRoomForm roomToEdit={room} />}
-      </>
-    );
+            <HiTrash />
+          </button>
+        </div>
+      </TableRow>
+      {showFormToEdit && <CreateRoomForm roomToEdit={room} />}
+    </>
+  );
 };
 
 export default RoomRow;

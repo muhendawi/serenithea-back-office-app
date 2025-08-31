@@ -28,18 +28,30 @@ export const deleteRoom = async (id: number) => {
 //------------------------------------------------------------------------------------------------
 /* A HELPER FUNCTION FOR IMAGE UPLOAD */
 //------------------------------------------------------------------------------------------------
-const uploadImage = async (imageName: string, imageFile: File, id: number) => {
+const uploadImage = async (
+  imageName: string,
+  imageFile: File,
+  id: number,
+  updatedId?: number
+) => {
   const { error: storageError } = await supabase.storage
     .from("room-images")
     .upload(imageName, imageFile);
 
   // 3. Revert the room update IF there was an error uploading the image
   if (storageError) {
-    await supabase.from("rooms").delete().eq("id", id);
-    console.error(storageError);
-    throw new Error(
-      "Room image could not be uploaded and the room was not created!"
-    );
+    if (updatedId) {
+      console.error(storageError);
+      throw new Error(
+        "Room image could not be uploaded and the room was not created!"
+      );
+    } else {
+      await supabase.from("rooms").delete().eq("id", id);
+      console.error(storageError);
+      throw new Error(
+        "Room image could not be uploaded and the room was not created!"
+      );
+    }
   }
 };
 //------------------------------------------------------------------------------------------------
@@ -137,7 +149,46 @@ export const updateRoom = async (updatedRoom: FormDataTypes) => {
 
   // 2. Upload the image (only if we have a new file)
   if (shouldUploadImage && imageFile) {
-    await uploadImage(imageName, imageFile, data.id);
+    await uploadImage(imageName, imageFile, data.id, updatedRoom.id);
+  }
+
+  return data;
+};
+
+//------------------------------------------------------------------------------------------------
+/* DUPLICATE AN EXISTING ROOM */
+//------------------------------------------------------------------------------------------------
+// Type guard function
+const isString = (image: FileList | File | string): image is string => {
+  return typeof image === "string";
+};
+
+export const duplicateRoom = async (newRoom: FormDataTypes) => {
+  // Type guard check
+  if (!isString(newRoom.image)) {
+    throw new Error("Image must be a File object for room creation");
+  }
+
+  // 1. Creating a room
+  const { data, error } = await supabase
+    .from("rooms")
+    .insert([
+      {
+        name: newRoom.name,
+        maxCapacity: newRoom.maxCapacity,
+        regularPrice: newRoom.regularPrice,
+        discount: newRoom.discount,
+        description: newRoom.description,
+        image: newRoom.image,
+      },
+    ])
+    // without specifying select(), single() the return data will be NULL
+    .select() // ✅ Return the inserted record
+    .single(); // ✅ Return object instead of array
+
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to create Room");
   }
 
   return data;
