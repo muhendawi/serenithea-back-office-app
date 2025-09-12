@@ -16,7 +16,6 @@ function UpdateSettingsForm() {
   ) => {
     const { value } = e.target;
     if (!value) return;
-
     updateExistingSetting({ [field]: Number(value) });
   };
   if (isLoading) return <Spinner />;

@@ -17,7 +17,6 @@ const TableRow = styled.div<TableRowProps>`
   column-gap: 2.4rem;
   align-items: center;
   padding: 1.4rem 3.5rem;
-
   /* 👇 this means do not add border-bottom to the last RoomRow */
   &:not(:last-child) {
     ${({ $showFormToEdit }) =>

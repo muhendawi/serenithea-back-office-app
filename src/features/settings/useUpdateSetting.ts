@@ -8,7 +8,8 @@ const useUpdateSetting = () => {
   // A Custom Hook for useMutation hook for editing an existing room
   const { mutate: updateExistingSetting, isPending: isUpdating } = useMutation({
     mutationFn: updateSetting,
-    onSuccess: () => {
+    onSuccess: (updatedData) => {
+      console.log(updatedData);
       toast.success("Setting successfully Updated!");
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
     },

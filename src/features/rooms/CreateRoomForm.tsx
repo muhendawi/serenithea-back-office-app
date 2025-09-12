@@ -13,10 +13,11 @@ import useCreateRoom from "./useCreateRoom";
 import useUpdateRoom from "./useUpdateRoom";
 
 type CreateRoomFormProps = {
-  roomToEdit: FormDataTypes;
+  roomToEdit?: FormDataTypes;
+  onCloseModal?: () => void;
 };
 
-function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
+function CreateRoomForm({ roomToEdit, onCloseModal }: CreateRoomFormProps) {
   // A Custom Hook for useMutation hook for inserting new rooms into the database
   const { createNewRoom, isCreating } = useCreateRoom();
 
@@ -45,7 +46,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
         ? data.image[0]
         : null;
 
-    if (isEditSession) {
+    if (isEditSession && roomToEdit !== undefined) {
       // Use new file or fallback to existing image
       const imageToUse = selectedFile || roomToEdit.image;
       updateExistingRoom(
@@ -64,6 +65,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
           {
             onSuccess: () => {
               reset();
+              onCloseModal?.();
             },
           }
         );
@@ -74,7 +76,10 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit)}
+      $type={onCloseModal ? "modal" : "default"}
+    >
       <FormRow error={errors.name?.message} label="Room name">
         <Input
           type="text"
@@ -158,7 +163,7 @@ function CreateRoomForm({ roomToEdit }: CreateRoomFormProps) {
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button $variation="secondary" type="reset">
+        <Button $variation="secondary" type="reset" onClick={onCloseModal}>
           Cancel
         </Button>
         <Button disabled={isCreatingOrEditing}>
